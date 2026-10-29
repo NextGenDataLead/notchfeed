@@ -1,0 +1,12 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NotchFeed" : {
+      "shouldTranslate" : false
+    },
+    "Quit NotchFeed" : {
+
+    }
+  },
+  "version" : "1.0"
+}

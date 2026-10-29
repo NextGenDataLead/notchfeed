@@ -1,0 +1,71 @@
+name: NotchFeed
+
+options:
+  bundleIdPrefix: com.nextgendatalead
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Ad-hoc signature only ("Sign to Run Locally"); no Apple Developer account.
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    GENERATE_INFOPLIST_FILE: YES
+
+targets:
+  NotchFeed:
+    type: application
+    platform: macOS
+    sources:
+      - App
+      - Resources
+    dependencies:
+      - target: NotchFeedCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nextgendatalead.NotchFeed
+        PRODUCT_NAME: NotchFeed
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_CFBundleDisplayName: NotchFeed
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.news
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 NextGenDataLead. MIT licence."
+
+  NotchFeedCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Core
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nextgendatalead.NotchFeedCore
+
+  NotchFeedCoreTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/NotchFeedCoreTests
+    dependencies:
+      - target: NotchFeedCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nextgendatalead.NotchFeedCoreTests
+
+schemes:
+  NotchFeed:
+    build:
+      targets:
+        NotchFeed: all
+        NotchFeedCoreTests: [test]
+    test:
+      targets:
+        - NotchFeedCoreTests

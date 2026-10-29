@@ -58,6 +58,53 @@ public actor FeedStore {
         return inserted
     }
 
+    // MARK: Fetch bookkeeping
+
+    public func refreshTargets() throws -> [FeedSnapshot] {
+        try modelContext.fetch(FetchDescriptor<Feed>(sortBy: [SortDescriptor(\.createdAt)])).map(FeedSnapshot.init)
+    }
+
+    /// Stores validators and new items after a 200. Returns the number of inserted items.
+    @discardableResult
+    public func recordSuccess(feedID: UUID, parsed: ParsedFeed, etag: String?, lastModified: String?,
+                              now: Date, retentionDays: Int) throws -> Int {
+        let feed = try feed(id: feedID)
+        feed.etag = etag
+        feed.lastModified = lastModified
+        feed.lastFetchedAt = now
+        feed.lastError = nil
+        feed.retryAfter = nil
+        if let siteURL = parsed.siteURL { feed.siteURL = siteURL }
+        if feed.title.isEmpty { feed.title = parsed.title }
+        return try ingest(parsed.items, feedID: feedID, now: now, retentionDays: retentionDays)
+    }
+
+    public func recordNotModified(feedID: UUID, now: Date) throws {
+        let feed = try feed(id: feedID)
+        feed.lastFetchedAt = now
+        feed.lastError = nil
+        feed.retryAfter = nil
+        try modelContext.save()
+    }
+
+    public func recordFailure(feedID: UUID, errorCode: String, retryAfter: Date?, now: Date) throws {
+        let feed = try feed(id: feedID)
+        feed.lastFetchedAt = now
+        feed.lastError = errorCode
+        feed.retryAfter = retryAfter
+        try modelContext.save()
+    }
+
+    /// Keeps an existing icon when a refresh finds none, but records the attempt so it isn't retried each cycle.
+    public func setFavicon(feedID: UUID, data: Data?, now: Date) throws {
+        let feed = try feed(id: feedID)
+        if let data { feed.faviconData = data }
+        feed.faviconFetchedAt = now
+        try modelContext.save()
+    }
+
+    // MARK: Read state
+
     public func markRead(dedupeKey: String) throws {
         let descriptor = FetchDescriptor<Item>(predicate: #Predicate { $0.dedupeKey == dedupeKey })
         guard let item = try modelContext.fetch(descriptor).first, !item.isRead else { return }

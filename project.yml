@@ -31,6 +31,12 @@ targets:
       - Resources
     dependencies:
       - target: NotchFeedCore
+    info:
+      path: App/Info.plist
+      properties:
+        # ATS can't be changed at runtime; TransportPolicy enforces https unless a feed allows http.
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nextgendatalead.NotchFeed

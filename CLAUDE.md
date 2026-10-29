@@ -43,6 +43,7 @@ xcodebuild -project NotchFeed.xcodeproj -scheme NotchFeed -configuration Debug -
 xcodebuild -project NotchFeed.xcodeproj -scheme NotchFeed -derivedDataPath build test -destination 'platform=macOS'
 open build/Build/Products/Debug/NotchFeed.app
 pkill -x NotchFeed                        # stop the running app before rebuilding
+scripts/sync-strings.sh                   # after a build: add new UI strings to Localizable.xcstrings
 ```
 
 Run the build and the tests after every meaningful change. Fix warnings, not just errors.

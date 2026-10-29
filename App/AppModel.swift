@@ -16,6 +16,18 @@ struct HeadlineEntry: Identifiable, Hashable {
     let isRead: Bool
 }
 
+/// One feed as the Feeds settings tab shows it.
+struct FeedRow: Identifiable, Hashable {
+    let id: UUID
+    let title: String
+    let url: URL
+    let favicon: NSImage?
+    let lastFetchedAt: Date?
+    let error: FetchError?
+    let retryAfter: Date?
+    let allowsInsecureConnection: Bool
+}
+
 /// Main-actor view of the store shared by the ticker and the menu bar. Reloads after every save of
 /// any model context, so writes from the background `FeedStore` show up without relying on `@Query`.
 @MainActor
@@ -27,7 +39,8 @@ final class AppModel {
 
     private(set) var headlines: [HeadlineEntry] = []
     private(set) var unreadCount = 0
-    private(set) var hasFeeds = false
+    private(set) var feeds: [FeedRow] = []
+    var hasFeeds: Bool { !feeds.isEmpty }
     /// Ticks every minute so relative ages stay current.
     private(set) var now = Date.now
     /// FR-5.2: stops the scroll; not kept across restarts.
@@ -77,6 +90,32 @@ final class AppModel {
         }
     }
 
+    /// FR-4.1: validates and adds a feed; the Feeds tab shows the error if it fails.
+    func subscribe(_ input: String, allowsInsecure: Bool) async throws(SubscribeError) {
+        try await coordinator.subscribe(to: input, allowsInsecure: allowsInsecure)
+    }
+
+    func removeFeed(_ id: UUID) {
+        Task {
+            do {
+                try await store.deleteFeed(id: id)
+            } catch {
+                Self.logger.error("Removing feed failed: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+    }
+
+    /// Applies a changed retention setting right away instead of at the next daily purge.
+    func applyRetention() {
+        Task {
+            do {
+                try await store.purge(retentionDays: AppSettings.retentionDays())
+            } catch {
+                Self.logger.error("Purge failed: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+    }
+
     private func scheduleReload() {
         reloadTask?.cancel()
         reloadTask = Task { [weak self] in
@@ -99,8 +138,10 @@ final class AppModel {
             let unread = try context.fetchCount(FetchDescriptor<Item>(predicate: #Predicate { !$0.isRead }))
             if unread != unreadCount { unreadCount = unread }
 
-            let feeds = try context.fetchCount(FetchDescriptor<Feed>())
-            if (feeds > 0) != hasFeeds { hasFeeds = feeds > 0 }
+            let rows = try context.fetch(FetchDescriptor<Feed>())
+                .map(row)
+                .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+            if rows != feeds { feeds = rows }
         } catch {
             Self.logger.error("Loading headlines failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -115,6 +156,19 @@ final class AppModel {
             link: item.link,
             date: item.sortDate,
             isRead: item.isRead
+        )
+    }
+
+    private func row(_ feed: Feed) -> FeedRow {
+        FeedRow(
+            id: feed.id,
+            title: feed.title,
+            url: feed.url,
+            favicon: favicon(for: feed),
+            lastFetchedAt: feed.lastFetchedAt,
+            error: feed.lastError.flatMap(FetchError.init(storageCode:)),
+            retryAfter: feed.retryAfter,
+            allowsInsecureConnection: feed.allowsInsecureConnection
         )
     }
 

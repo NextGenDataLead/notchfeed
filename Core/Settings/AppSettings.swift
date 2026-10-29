@@ -6,6 +6,8 @@ public enum AppSettings {
         public static let tickerPosition = "tickerPosition"
         /// `CGDirectDisplayID` of the chosen display; 0 means the primary display.
         public static let tickerDisplayID = "tickerDisplayID"
+        /// Name of the chosen display, shown while it isn't connected.
+        public static let tickerDisplayName = "tickerDisplayName"
         public static let showFeedName = "showFeedName"
         public static let showUnreadCount = "showUnreadCount"
         public static let retentionDays = "retentionDays"

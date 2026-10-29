@@ -7,8 +7,8 @@ public actor RefreshCoordinator {
     private static let purgeInterval: TimeInterval = 24 * 60 * 60
     private static let logger = Logger(subsystem: "com.nextgendatalead.NotchFeed", category: "refresh")
 
-    private let store: FeedStore
-    private let fetcher: FeedFetcher
+    let store: FeedStore
+    let fetcher: FeedFetcher
     private let favicons: FaviconFetcher
     private let maxParallelFetches: Int
     private let retentionDays: @Sendable () -> Int
@@ -90,13 +90,7 @@ public actor RefreshCoordinator {
             case .notModified:
                 try await store.recordNotModified(feedID: target.id, now: now)
             case let .updated(feed, etag, lastModified):
-                try await store.recordSuccess(feedID: target.id, parsed: feed, etag: etag, lastModified: lastModified,
-                                              now: now, retentionDays: retentionDays())
-                if target.needsFavicon(now: now) {
-                    let icon = await favicons.fetch(iconURL: feed.iconURL, siteURL: feed.siteURL ?? target.siteURL,
-                                                    feedURL: target.url, allowsInsecure: target.allowsInsecureConnection)
-                    try await store.setFavicon(feedID: target.id, data: icon, now: now)
-                }
+                try await save(feed, etag: etag, lastModified: lastModified, for: target, now: now)
             }
         } catch let error as FetchError {
             let retryAfter: Date? = if case .rateLimited(let date) = error { date } else { nil }
@@ -106,6 +100,16 @@ public actor RefreshCoordinator {
         } catch {
             Self.logger.error("Storing feed \(target.id, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    /// Stores a fetched feed's items and validators, and its favicon when that is due.
+    nonisolated func save(_ feed: ParsedFeed, etag: String?, lastModified: String?, for target: FeedSnapshot, now: Date) async throws {
+        try await store.recordSuccess(feedID: target.id, parsed: feed, etag: etag, lastModified: lastModified,
+                                      now: now, retentionDays: retentionDays())
+        guard target.needsFavicon(now: now) else { return }
+        let icon = await favicons.fetch(iconURL: feed.iconURL, siteURL: feed.siteURL ?? target.siteURL,
+                                        feedURL: target.url, allowsInsecure: target.allowsInsecureConnection)
+        try await store.setFavicon(feedID: target.id, data: icon, now: now)
     }
 }
 

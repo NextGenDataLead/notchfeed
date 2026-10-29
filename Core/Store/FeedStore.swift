@@ -3,16 +3,34 @@ import SwiftData
 
 public enum FeedStoreError: Error, Equatable {
     case feedNotFound
+    case duplicateURL
 }
 
 /// All writes to feeds and items, off the main actor.
 @ModelActor
 public actor FeedStore {
     public func addFeed(url: URL, title: String, allowsInsecureConnection: Bool = false, now: Date = .now) throws -> UUID {
+        guard try !hasFeed(withAnyOf: [url]) else { throw FeedStoreError.duplicateURL }
         let feed = Feed(url: url, title: title, allowsInsecureConnection: allowsInsecureConnection, createdAt: now)
         modelContext.insert(feed)
         try modelContext.save()
         return feed.id
+    }
+
+    /// Feed URLs compare without a trailing slash, so `…/rss` and `…/rss/` count as one feed.
+    public func hasFeed(withAnyOf urls: [URL]) throws -> Bool {
+        let wanted = Set(urls.map(Self.comparable))
+        return try modelContext.fetch(FetchDescriptor<Feed>()).contains { wanted.contains(Self.comparable($0.url)) }
+    }
+
+    public func snapshot(feedID: UUID) throws -> FeedSnapshot {
+        FeedSnapshot(try feed(id: feedID))
+    }
+
+    private static func comparable(_ url: URL) -> String {
+        var text = url.absoluteString.lowercased()
+        if text.hasSuffix("/") { text.removeLast() }
+        return text
     }
 
     public func deleteFeed(id: UUID) throws {

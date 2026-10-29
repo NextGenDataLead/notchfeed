@@ -1,6 +1,6 @@
 import Foundation
 
-public enum FeedParserError: Error, Equatable, Sendable {
+public enum FeedParserError: Error, Hashable, Sendable {
     /// The document parsed but isn't RSS or Atom (for example an HTML page).
     case notAFeed
     /// The data isn't usable XML, even after repair.

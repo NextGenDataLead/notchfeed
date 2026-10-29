@@ -14,5 +14,11 @@ struct NotchFeedApp: App {
         } label: {
             MenuBarLabel(model: appDelegate.model)
         }
+
+        Settings {
+            if let model = appDelegate.model {
+                SettingsView(model: model)
+            }
+        }
     }
 }

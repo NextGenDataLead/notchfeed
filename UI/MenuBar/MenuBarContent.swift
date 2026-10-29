@@ -30,6 +30,7 @@ struct MenuBarContent: View {
     private static let titleLength = 80
 
     let model: AppModel
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         let recent = model.headlines.prefix(AppDefaults.menuItemLimit)
@@ -59,8 +60,10 @@ struct MenuBarContent: View {
 
         Divider()
 
-        SettingsLink {
-            Text("Settings…")
+        Button("Settings…") {
+            // An accessory app must activate itself, or the window opens behind other apps.
+            NSApp.activate()
+            openSettings()
         }
         .keyboardShortcut(",")
         Button("Quit NotchFeed") { NSApplication.shared.terminate(nil) }

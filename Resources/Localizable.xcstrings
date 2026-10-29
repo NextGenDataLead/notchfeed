@@ -1,11 +1,213 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ (not connected)" : {
+
+    },
+    "%@: %@, %@" : {
+      "comment" : "VoiceOver label of a ticker item",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@, %3$@"
+          }
+        }
+      }
+    },
+    "%@: %@, %@, read" : {
+      "comment" : "VoiceOver label of a read ticker item",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@, %3$@, read"
+          }
+        }
+      }
+    },
+    "%lld+" : {
+
+    },
+    "%lldd" : {
+      "comment" : "Age in days, compact"
+    },
+    "%lldh" : {
+      "comment" : "Age in hours, compact"
+    },
+    "%lldm" : {
+      "comment" : "Age in minutes, compact"
+    },
+    "Add" : {
+
+    },
+    "Allow NotchFeed in Login Items to finish turning this on." : {
+
+    },
+    "Allow insecure connection for this feed" : {
+
+    },
+    "Bottom, above the Dock" : {
+
+    },
+    "Display" : {
+
+    },
+    "Enter a feed address, such as https://example.com/feed.xml." : {
+
+    },
+    "Feed address" : {
+
+    },
+    "Feeds" : {
+
+    },
+    "General" : {
+
+    },
+    "Headlines" : {
+
+    },
+    "Its headlines are removed too." : {
+
+    },
+    "Keep items for %lld days" : {
+
+    },
+    "Menu bar" : {
+
+    },
+    "No feeds yet" : {
+
+    },
+    "No feeds yet. Add some in NotchFeed Settings." : {
+
+    },
+    "Not fetched yet" : {
+
+    },
+    "Not secure" : {
+
+    },
     "NotchFeed" : {
       "shouldTranslate" : false
     },
+    "NotchFeed can't open its database" : {
+
+    },
+    "NotchFeed, %lld unread" : {
+
+    },
+    "Open Login Items…" : {
+
+    },
+    "Open NotchFeed at login" : {
+
+    },
+    "Paste the address of an RSS or Atom feed above." : {
+
+    },
+    "Pause Ticker" : {
+
+    },
+    "Position" : {
+
+    },
+    "Primary display" : {
+
+    },
+    "Quit" : {
+
+    },
     "Quit NotchFeed" : {
 
+    },
+    "Refresh Now" : {
+
+    },
+    "Remove %@" : {
+
+    },
+    "Remove %@?" : {
+
+    },
+    "Remove Feed" : {
+
+    },
+    "Remove feed" : {
+
+    },
+    "Resume Ticker" : {
+
+    },
+    "Settings…" : {
+
+    },
+    "Show feed name" : {
+
+    },
+    "Show unread count" : {
+
+    },
+    "Storage" : {
+
+    },
+    "The feed couldn't be read." : {
+
+    },
+    "The feed is larger than 10 MB." : {
+
+    },
+    "The feed moved to an insecure (http) address, which isn't allowed for this feed." : {
+
+    },
+    "The server returned an error (HTTP %lld)." : {
+
+    },
+    "The server says this feed doesn't exist." : {
+
+    },
+    "The site asked NotchFeed to slow down." : {
+
+    },
+    "The site asked NotchFeed to wait. Next try after %@." : {
+
+    },
+    "This address is a web page, not an RSS or Atom feed. Use the address of the feed itself." : {
+
+    },
+    "This feed doesn't work over a secure (https) connection." : {
+
+    },
+    "This feed only works over an insecure (http) connection." : {
+
+    },
+    "This feed uses plain http." : {
+
+    },
+    "This isn't a web address NotchFeed can fetch." : {
+
+    },
+    "Ticker" : {
+
+    },
+    "Top, under the menu bar" : {
+
+    },
+    "Updated %@" : {
+
+    },
+    "Waiting for headlines…" : {
+
+    },
+    "Without encryption, others on your network can see which feed you read and change the headlines you receive, including the links they open." : {
+
+    },
+    "You already follow this feed." : {
+
+    },
+    "now" : {
+      "comment" : "Age of an item published less than a minute ago"
     }
   },
   "version" : "1.0"

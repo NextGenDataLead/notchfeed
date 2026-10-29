@@ -1,6 +1,6 @@
 import Foundation
 
-public enum FetchError: Error, Equatable, Sendable {
+public enum FetchError: Error, Hashable, Sendable {
     /// Plain http (directly or through a redirect) for a feed that doesn't allow it.
     case insecureConnectionNotAllowed
     /// Not an http or https URL.

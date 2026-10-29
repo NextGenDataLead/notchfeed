@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Cut off</title>
+    <link>https://example.com/</link>
+    <item>
+      <title>Complete item one</title>
+      <link>https://example.com/1</link>
+      <guid>t1</guid>
+    </item>
+    <item>
+      <title>Complete item two</title>
+      <link>https://example.com/2</link>
+      <guid>t2</guid>
+    </item>
+    <item>
+      <title>Cut off in the mid

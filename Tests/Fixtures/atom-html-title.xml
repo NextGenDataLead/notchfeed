@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title type="html">Atom &amp;amp; friends</title>
+  <link href="https://example.org/"/>
+  <link rel="self" href="https://example.org/feed.atom"/>
+  <icon>https://example.org/favicon.png</icon>
+  <id>urn:uuid:feed</id>
+  <updated>2026-10-28T12:00:00Z</updated>
+  <entry>
+    <title type="html">&lt;em&gt;Escaped&lt;/em&gt; HTML title</title>
+    <link rel="alternate" type="text/html" href="https://example.org/1"/>
+    <id>urn:uuid:1</id>
+    <updated>2026-10-28T12:00:00Z</updated>
+  </entry>
+  <entry>
+    <title type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Hello <b>XHTML</b> world</div></title>
+    <link href="https://example.org/2"/>
+    <id>urn:uuid:2</id>
+    <published>2026-10-27T08:00:00.123456+01:00</published>
+    <updated>2026-10-28T09:00:00Z</updated>
+  </entry>
+  <entry>
+    <title>Only updated</title>
+    <link rel="edit" href="https://example.org/edit/3"/>
+    <link rel="alternate" href="https://example.org/3"/>
+    <id>urn:uuid:3</id>
+    <updated>2026-10-26T07:00:00Z</updated>
+  </entry>
+</feed>

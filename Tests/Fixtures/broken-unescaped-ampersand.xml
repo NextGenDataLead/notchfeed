@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Tom & Jerry News</title>
+    <link>https://example.com/?a=1&b=2</link>
+    <item>
+      <title>Salt & pepper&nbsp;&eacute;dition &copy; 2026 &amp; more</title>
+      <link>https://example.com/posts?id=1&ref=rss</link>
+      <guid>amp-1</guid>
+    </item>
+    <item>
+      <title>Second</title>
+      <link>https://example.com/posts?id=2</link>
+      <guid>amp-2</guid>
+    </item>
+  </channel>
+</rss>

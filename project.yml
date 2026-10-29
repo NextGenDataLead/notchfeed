@@ -54,6 +54,9 @@ targets:
     platform: macOS
     sources:
       - Tests/NotchFeedCoreTests
+      - path: Tests/Fixtures
+        type: folder
+        buildPhase: resources
     dependencies:
       - target: NotchFeedCore
     settings:

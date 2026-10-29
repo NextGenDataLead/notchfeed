@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Daring Fireball</title>
+<subtitle>By John Gruber</subtitle>
+<link rel="alternate" type="text/html" href="https://daringfireball.net/" />
+<link rel="self" type="application/atom+xml" href="https://daringfireball.net/feeds/main" />
+<id>https://daringfireball.net/feeds/main</id>
+<updated>2026-10-29T15:14:59Z</updated><rights>Copyright © 2026, John Gruber</rights><entry>
+	<title>The Space Shuttle Discovery’s Starboard Side ‘s’ Is Upside Down</title>
+	<link rel="alternate" type="text/html" href="https://www.theautopian.com/a-typography-geek-pointed-out-something-about-the-space-shuttle-discovery-and-now-i-cant-unsee-it/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xov" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/10/29/space-shuttle-discovery-s" />
+	<id>tag:daringfireball.net,2026:/linked//6.43663</id>
+	<published>2026-10-29T15:06:56Z</published>
+	<updated>2026-10-29T15:14:59Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+  </entry><entry>
+	<title>Steven Levy on the New MacBook Pro, With, Yes, a Touchscreen</title>
+	<link rel="alternate" type="text/html" href="https://www.wired.com/story/the-inside-story-of-why-apple-finally-brought-a-touch-display-to-the-mac/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xou" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/10/29/levy-ternus-macbook-pros" />
+	<id>tag:daringfireball.net,2026:/linked//6.43662</id>
+	<published>2026-10-29T04:06:15Z</published>
+	<updated>2026-10-29T04:11:57Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+  </entry><entry>
+	<title>Guessing the Name: MacBook Studio?</title>
+	<link rel="alternate" type="text/html" href="https://www.macrumors.com/2026/10/28/macbook-studio/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xot" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/10/28/macbook-studio-name-guess" />
+	<id>tag:daringfireball.net,2026:/linked//6.43661</id>
+	<published>2026-10-28T14:58:45Z</published>
+	<updated>2026-10-28T17:50:44Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+  </entry></feed><!-- THE END -->

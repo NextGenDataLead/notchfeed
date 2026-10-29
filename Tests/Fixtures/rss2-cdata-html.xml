@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title><![CDATA[CDATA &amp; HTML]]></title>
+    <link>https://example.com/</link>
+    <item>
+      <title><![CDATA[<b>Bold</b> claims &amp; <i>italic</i>   news]]></title>
+      <link>https://example.com/a</link>
+      <guid>a</guid>
+    </item>
+    <item>
+      <title>AT&amp;amp;T buys &#8220;something&#8221; &amp;mdash; again</title>
+      <link>https://example.com/b</link>
+      <guid>b</guid>
+    </item>
+  </channel>
+</rss>

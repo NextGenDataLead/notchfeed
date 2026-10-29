@@ -25,7 +25,7 @@ final class TickerScrollView: NSView {
         didSet { if isPaused != oldValue { applyPause() } }
     }
     var reduceMotion = false {
-        didSet { if reduceMotion != oldValue { rebuildLayers() } }
+        didSet { if reduceMotion != oldValue { apply(pending ?? segments) } }
     }
 
     private let stripLayer = CALayer()
@@ -51,11 +51,13 @@ final class TickerScrollView: NSView {
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
+    /// While scrolling (paused or not), anything that would move items waits for the loop end,
+    /// so the strip never jumps under the reader.
     func show(_ newSegments: [TickerSegment]) {
-        if !segments.isEmpty, newSegments.count == segments.count,
+        if pending == nil, !segments.isEmpty, newSegments.count == segments.count,
            zip(newSegments, segments).allSatisfy({ $0.entry?.id == $1.entry?.id && $0.size == $1.size }) {
             updateInPlace(newSegments)
-        } else if isScrolling, !isPaused {
+        } else if isScrolling {
             pending = newSegments
         } else {
             apply(newSegments)
@@ -66,7 +68,7 @@ final class TickerScrollView: NSView {
         super.layout()
         guard bounds.size != laidOutSize else { return }
         laidOutSize = bounds.size
-        rebuildLayers()
+        apply(pending ?? segments)
     }
 
     // MARK: Content

@@ -121,8 +121,9 @@ final class TickerController {
         if segments.isEmpty, let message = messageSegment(scale: scale) {
             segments = [message]
         }
-        scrollView.show(segments)
+        // Pause state first: a resume must not look like "not scrolling" and apply content mid-loop.
         scrollView.isPaused = model.isTickerPaused
+        scrollView.show(segments)
     }
 
     private func segment(for entry: HeadlineEntry, age: String, showFeedName: Bool, scale: CGFloat, now: Date) -> TickerSegment? {

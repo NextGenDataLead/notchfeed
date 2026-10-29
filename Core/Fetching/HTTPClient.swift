@@ -30,25 +30,41 @@ public final class URLSessionHTTPClient: HTTPClient {
     }
 
     /// No URL cache: the fetcher does its own conditional requests and must see real 304s.
+    /// The resource timeout bounds a whole fetch, so a server trickling bytes can't hold a refresh open.
     public static func defaultConfiguration() -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 90
         configuration.httpCookieStorage = nil
         return configuration
     }
 
+    /// Streams the body and stops as soon as it passes `maxResponseBytes`, so memory stays bounded.
     public func data(for request: URLRequest, allowsInsecure: Bool) async throws -> (Data, HTTPURLResponse) {
         try TransportPolicy.check(request.url, allowsInsecure: allowsInsecure)
-        let (data, response) = try await session.data(for: request, delegate: RedirectPolicy(allowsInsecure: allowsInsecure))
+        let (bytes, response) = try await session.bytes(for: request, delegate: RedirectPolicy(allowsInsecure: allowsInsecure))
         guard let http = response as? HTTPURLResponse else { throw FetchError.unsupportedURL }
         if (300..<400).contains(http.statusCode), http.statusCode != 304 {
             // The redirect policy refused to follow; tell the caller why.
             let location = http.value(forHTTPHeaderField: "Location").flatMap { URL(string: $0, relativeTo: http.url) }
             try TransportPolicy.check(location, allowsInsecure: allowsInsecure)
         }
-        guard data.count <= maxResponseBytes else { throw FetchError.tooLarge }
+        guard http.expectedContentLength <= Int64(maxResponseBytes) else {
+            bytes.task.cancel()
+            throw FetchError.tooLarge
+        }
+
+        var data = Data()
+        if http.expectedContentLength > 0 { data.reserveCapacity(Int(http.expectedContentLength)) }
+        for try await byte in bytes {
+            guard data.count < maxResponseBytes else {
+                bytes.task.cancel()
+                throw FetchError.tooLarge
+            }
+            data.append(byte)
+        }
         return (data, http)
     }
 }

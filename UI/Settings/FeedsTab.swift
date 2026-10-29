@@ -54,17 +54,22 @@ struct FeedsTab: View {
                 Button("Add", action: add)
                     .keyboardShortcut(.defaultAction)
                     .disabled(isAdding || input.trimmingCharacters(in: .whitespaces).isEmpty
-                              || (error == .httpsUnavailable && !allowInsecure))
+                              || (httpsFailure != nil && !allowInsecure))
             }
 
-            if error == .httpsUnavailable {
-                InsecureWarning(allowInsecure: $allowInsecure)
+            if let httpsFailure {
+                InsecureWarning(httpsFailure: httpsFailure, allowInsecure: $allowInsecure)
             } else if let error {
                 Label(FeedErrorText.message(for: error), systemImage: "exclamationmark.circle")
                     .foregroundStyle(.red)
                     .font(.callout)
             }
         }
+    }
+
+    /// Set when the https attempt failed and plain http needs the user's opt-in.
+    private var httpsFailure: FetchError? {
+        if case .httpsUnavailable(let reason) = error { reason } else { nil }
     }
 
     private func add() {
@@ -86,14 +91,19 @@ struct FeedsTab: View {
 }
 
 private struct InsecureWarning: View {
+    let httpsFailure: FetchError
     @Binding var allowInsecure: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Label("This feed only works over an insecure (http) connection.", systemImage: "exclamationmark.triangle.fill")
+            Label("This feed doesn't work over a secure (https) connection.", systemImage: "exclamationmark.triangle.fill")
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.orange)
-            Text("Without encryption, others on your network can see which feed you read and change the headlines you receive, including the links they open.")
+            Text("Over https: \(FeedErrorText.message(for: httpsFailure))")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("You can use plain http instead. Without encryption, others on your network can see which feed you read and change the headlines you receive, including the links they open.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

@@ -11,6 +11,9 @@ public final class Item {
     /// Used for ordering and retention: the published date, but never later than first seen,
     /// so items with missing or future dates don't stick to the front of the ticker.
     public var sortDate: Date
+    /// Last fetch that still listed the item. Keeps undated items that a feed keeps listing from
+    /// being purged and then re-inserted as new.
+    public var lastSeenAt: Date = Date.distantPast
     public var isRead: Bool
     public var feed: Feed?
 
@@ -21,6 +24,7 @@ public final class Item {
         self.publishedAt = publishedAt
         self.firstSeenAt = firstSeenAt
         self.sortDate = Item.sortDate(publishedAt: publishedAt, firstSeenAt: firstSeenAt)
+        self.lastSeenAt = firstSeenAt
         self.isRead = false
         self.feed = feed
     }

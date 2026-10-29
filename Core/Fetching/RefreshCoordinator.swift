@@ -5,13 +5,13 @@ import os
 /// `maxParallelFetches` requests in flight (FR-8.5). Feeds inside a Retry-After window are skipped.
 public actor RefreshCoordinator {
     private static let purgeInterval: TimeInterval = 24 * 60 * 60
-    private static let logger = Logger(subsystem: "com.nextgendatalead.NotchFeed", category: "refresh")
+    static let logger = Logger(subsystem: "com.nextgendatalead.NotchFeed", category: "refresh")
 
     let store: FeedStore
     let fetcher: FeedFetcher
     private let favicons: FaviconFetcher
     private let maxParallelFetches: Int
-    private let retentionDays: @Sendable () -> Int
+    let retentionDays: @Sendable () -> Int
 
     private var isRefreshing = false
     private var lastPurge: Date?
@@ -107,6 +107,10 @@ public actor RefreshCoordinator {
         try await store.recordSuccess(feedID: target.id, parsed: feed, etag: etag, lastModified: lastModified,
                                       now: now, retentionDays: retentionDays())
         guard target.needsFavicon(now: now) else { return }
+        try await saveFavicon(for: feed, target: target, now: now)
+    }
+
+    nonisolated func saveFavicon(for feed: ParsedFeed, target: FeedSnapshot, now: Date) async throws {
         let icon = await favicons.fetch(iconURL: feed.iconURL, siteURL: feed.siteURL ?? target.siteURL,
                                         feedURL: target.url, allowsInsecure: target.allowsInsecureConnection)
         try await store.setFavicon(feedID: target.id, data: icon, now: now)

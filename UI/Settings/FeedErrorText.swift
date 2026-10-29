@@ -36,8 +36,8 @@ enum FeedErrorText {
             String(localized: "Enter a feed address, such as https://example.com/feed.xml.")
         case .alreadySubscribed:
             String(localized: "You already follow this feed.")
-        case .httpsUnavailable:
-            String(localized: "This feed doesn't work over a secure (https) connection.")
+        case .httpsUnavailable(let reason):
+            String(localized: "This feed doesn't work over a secure (https) connection: \(message(for: reason))")
         case .fetch(let fetchError):
             message(for: fetchError)
         }

@@ -65,7 +65,8 @@ struct SubscribeTests {
     @Test func refusesHTTPWhenHTTPSFailsAndNotAllowed() async throws {
         let client = StubHTTPClient([URL(string: "http://example.com/rss")!: .init(body: feedBody)])
 
-        await #expect(throws: SubscribeError.httpsUnavailable) {
+        // The stub answers the https URL with "host not found".
+        await #expect(throws: SubscribeError.httpsUnavailable(.transport(code: URLError.Code.cannotFindHost.rawValue))) {
             try await coordinator(client).subscribe(to: "http://example.com/rss", allowsInsecure: false, now: now)
         }
         #expect(try feeds().isEmpty)
@@ -94,6 +95,27 @@ struct SubscribeTests {
             try await coordinator.subscribe(to: "http://example.com/rss", allowsInsecure: false, now: now)
         }
         #expect(try feeds().count == 1)
+    }
+
+    @Test func treatsHTTPAndHTTPSVersionsAsTheSameFeed() async throws {
+        let client = StubHTTPClient([URL(string: "http://example.com/rss")!: .init(body: feedBody)])
+        let coordinator = coordinator(client)
+        _ = try await coordinator.subscribe(to: "http://example.com/rss", allowsInsecure: true, now: now)
+
+        await #expect(throws: SubscribeError.alreadySubscribed) {
+            try await coordinator.subscribe(to: "https://EXAMPLE.com/rss/", allowsInsecure: false, now: now)
+        }
+    }
+
+    @Test func pathsDifferingOnlyInCaseAreDifferentFeeds() async throws {
+        let client = StubHTTPClient([
+            URL(string: "https://example.com/Feed")!: .init(body: feedBody),
+            URL(string: "https://example.com/feed")!: .init(body: feedBody),
+        ])
+        let coordinator = coordinator(client)
+        _ = try await coordinator.subscribe(to: "https://example.com/Feed", allowsInsecure: false, now: now)
+        _ = try await coordinator.subscribe(to: "https://example.com/feed", allowsInsecure: false, now: now)
+        #expect(try feeds().count == 2)
     }
 
     @Test func reportsPagesThatAreNotFeeds() async throws {

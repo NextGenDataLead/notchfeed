@@ -4,8 +4,8 @@ public enum SubscribeError: Error, Equatable, Sendable {
     /// Not something that can be turned into an http(s) feed URL.
     case invalidURL
     case alreadySubscribed
-    /// The http URL doesn't work over https, and the user hasn't allowed plain http for it.
-    case httpsUnavailable
+    /// The http URL doesn't work over https (with the https error), and plain http isn't allowed for it.
+    case httpsUnavailable(FetchError)
     case fetch(FetchError)
 }
 
@@ -58,25 +58,47 @@ extension RefreshCoordinator {
         if !isPlainHTTP {
             let secure = try await firstFetch(url, allowsInsecure: false)
             fetched = (url, secure.feed, secure.etag, secure.lastModified)
-        } else if let secureURL, let secure = try? await firstFetch(secureURL, allowsInsecure: false) {
-            fetched = (secureURL, secure.feed, secure.etag, secure.lastModified)
         } else {
-            guard allowsInsecure else { throw .httpsUnavailable }
+            var httpsError = FetchError.unsupportedURL
+            if let secureURL {
+                do throws(SubscribeError) {
+                    let secure = try await firstFetch(secureURL, allowsInsecure: false)
+                    return try await add((secureURL, secure.feed, secure.etag, secure.lastModified), now: now)
+                } catch {
+                    if case .fetch(let reason) = error { httpsError = reason }
+                }
+            }
+            guard allowsInsecure else { throw .httpsUnavailable(httpsError) }
             let plain = try await firstFetch(url, allowsInsecure: true)
             fetched = (url, plain.feed, plain.etag, plain.lastModified)
         }
+        return try await add(fetched, now: now)
+    }
 
+    /// Saves the feed and its first items. Once the feed is saved, later problems are logged rather
+    /// than reported, so the user never sees "failed" for a feed that was added. The favicon loads in
+    /// the background so it doesn't hold up the Add button.
+    private func add(_ fetched: (url: URL, feed: ParsedFeed, etag: String?, lastModified: String?), now: Date) async throws(SubscribeError) -> UUID {
+        let id: UUID
         do {
-            let id = try await store.addFeed(url: fetched.url, title: fetched.feed.title,
-                                             allowsInsecureConnection: fetched.url.scheme?.lowercased() == "http", now: now)
-            let snapshot = try await store.snapshot(feedID: id)
-            try await save(fetched.feed, etag: fetched.etag, lastModified: fetched.lastModified, for: snapshot, now: now)
-            return id
+            id = try await store.addFeed(url: fetched.url, title: fetched.feed.title,
+                                         allowsInsecureConnection: fetched.url.scheme?.lowercased() == "http", now: now)
         } catch FeedStoreError.duplicateURL {
             throw .alreadySubscribed
         } catch {
+            Self.logger.error("Adding feed failed: \(error.localizedDescription, privacy: .public)")
             throw .fetch(.transport(code: URLError.Code.unknown.rawValue))
         }
+
+        do {
+            try await store.recordSuccess(feedID: id, parsed: fetched.feed, etag: fetched.etag, lastModified: fetched.lastModified,
+                                          now: now, retentionDays: retentionDays())
+            let snapshot = try await store.snapshot(feedID: id)
+            Task { try? await saveFavicon(for: fetched.feed, target: snapshot, now: now) }
+        } catch {
+            Self.logger.error("Storing first items of feed \(id, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
+        }
+        return id
     }
 
     private func firstFetch(_ url: URL, allowsInsecure: Bool) async throws(SubscribeError) -> (feed: ParsedFeed, etag: String?, lastModified: String?) {

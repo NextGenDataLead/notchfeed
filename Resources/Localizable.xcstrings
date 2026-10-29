@@ -104,6 +104,9 @@
     "Open NotchFeed at login" : {
 
     },
+    "Over https: %@" : {
+
+    },
     "Paste the address of an RSS or Atom feed above." : {
 
     },
@@ -179,7 +182,7 @@
     "This feed doesn't work over a secure (https) connection." : {
 
     },
-    "This feed only works over an insecure (http) connection." : {
+    "This feed doesn't work over a secure (https) connection: %@" : {
 
     },
     "This feed uses plain http." : {
@@ -200,10 +203,10 @@
     "Waiting for headlines…" : {
 
     },
-    "Without encryption, others on your network can see which feed you read and change the headlines you receive, including the links they open." : {
+    "You already follow this feed." : {
 
     },
-    "You already follow this feed." : {
+    "You can use plain http instead. Without encryption, others on your network can see which feed you read and change the headlines you receive, including the links they open." : {
 
     },
     "now" : {

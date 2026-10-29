@@ -84,6 +84,33 @@ struct FeedStoreTests {
         #expect(try fetchItems().map(\.title) == ["Item b"])
     }
 
+    @Test func undatedItemStillInFeedIsNotPurgedAndDoesNotReturnAsNew() async throws {
+        let feedID = try await addFeed()
+        let undated = ParsedItem(guid: "u", title: "Undated", link: nil, publishedAt: nil)
+        _ = try await store.ingest([undated], feedID: feedID, now: now, retentionDays: 30)
+        let key = try #require(fetchItems().first?.dedupeKey)
+        try await store.markRead(dedupeKey: key)
+
+        // 40 days later the feed still lists the item.
+        let later = now.addingTimeInterval(days(40))
+        let inserted = try await store.ingest([undated], feedID: feedID, now: later, retentionDays: 30)
+        let removed = try await store.purge(retentionDays: 30, now: later)
+
+        #expect(inserted == 0)
+        #expect(removed == 0)
+        #expect(try fetchItems().first?.isRead == true)
+    }
+
+    @Test func undatedItemIsPurgedOnceTheFeedStopsListingIt() async throws {
+        let feedID = try await addFeed()
+        let undated = ParsedItem(guid: "u", title: "Undated", link: nil, publishedAt: nil)
+        _ = try await store.ingest([undated], feedID: feedID, now: now, retentionDays: 30)
+
+        let removed = try await store.purge(retentionDays: 30, now: now.addingTimeInterval(days(31)))
+
+        #expect(removed == 1)
+    }
+
     @Test func futureDatesSortNoLaterThanFirstSeen() async throws {
         let feedID = try await addFeed()
         let future = ParsedItem(guid: "f", title: "Future", link: nil, publishedAt: now.addingTimeInterval(days(3)))

@@ -17,7 +17,8 @@ public actor FeedStore {
         return feed.id
     }
 
-    /// Feed URLs compare without a trailing slash, so `…/rss` and `…/rss/` count as one feed.
+    /// Feed URLs compare by host (any case), path and query, without the scheme or a trailing slash,
+    /// so `http://x/rss` and `https://X/rss/` are one feed but `/Feed` and `/feed` are two.
     public func hasFeed(withAnyOf urls: [URL]) throws -> Bool {
         let wanted = Set(urls.map(Self.comparable))
         return try modelContext.fetch(FetchDescriptor<Feed>()).contains { wanted.contains(Self.comparable($0.url)) }
@@ -28,9 +29,12 @@ public actor FeedStore {
     }
 
     private static func comparable(_ url: URL) -> String {
-        var text = url.absoluteString.lowercased()
-        if text.hasSuffix("/") { text.removeLast() }
-        return text
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return url.absoluteString }
+        var path = components.percentEncodedPath
+        if path.hasSuffix("/") { path.removeLast() }
+        let port = components.port.map { ":\($0)" } ?? ""
+        let query = components.percentEncodedQuery.map { "?\($0)" } ?? ""
+        return (components.host?.lowercased() ?? "") + port + path + query
     }
 
     public func deleteFeed(id: UUID) throws {
@@ -58,6 +62,7 @@ public actor FeedStore {
             if let item = known[candidate.key] {
                 if item.title != candidate.item.title { item.title = candidate.item.title }
                 if item.link != candidate.item.link { item.link = candidate.item.link }
+                item.lastSeenAt = now
                 continue
             }
             let item = Item(
@@ -134,8 +139,12 @@ public actor FeedStore {
     @discardableResult
     public func purge(retentionDays: Int, now: Date = .now) throws -> Int {
         let cutoff = Self.cutoff(retentionDays: retentionDays, now: now)
-        // A batch delete fails on the Feed <-> Item inverse, so delete item by item.
-        let expired = try modelContext.fetch(FetchDescriptor<Item>(predicate: #Predicate { $0.sortDate < cutoff }))
+        // Dated items past the window are never re-inserted (ingest skips them). Undated ones would be,
+        // so they stay while the feed still lists them. A batch delete fails on the Feed <-> Item
+        // inverse, so delete item by item.
+        let expired = try modelContext.fetch(FetchDescriptor<Item>(predicate: #Predicate {
+            $0.sortDate < cutoff && ($0.publishedAt != nil || $0.lastSeenAt < cutoff)
+        }))
         guard !expired.isEmpty else { return 0 }
         expired.forEach(modelContext.delete)
         try modelContext.save()

@@ -7,6 +7,7 @@ struct GeneralTab: View {
 
     @State private var launchAtLogin = LaunchAtLogin()
     @State private var screens: [DisplayOption] = DisplayOption.connected()
+    @State private var retentionTask: Task<Void, Never>?
 
     @AppStorage(AppSettings.Key.tickerPosition) private var position = AppDefaults.tickerPosition
     @AppStorage(AppSettings.Key.tickerDisplayID) private var displayID = 0
@@ -61,13 +62,23 @@ struct GeneralTab: View {
                 Stepper(value: $retentionDays, in: AppSettings.retentionRange) {
                     Text("Keep items for \(retentionDays) days")
                 }
-                .onChange(of: retentionDays) { model.applyRetention() }
+                .onChange(of: retentionDays) { scheduleRetention() }
             }
         }
         .formStyle(.grouped)
         .onAppear { launchAtLogin.refresh() }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)) { _ in
             screens = DisplayOption.connected()
+        }
+    }
+
+    /// Purging can't be undone, so wait until the stepper has settled instead of purging on every click.
+    private func scheduleRetention() {
+        retentionTask?.cancel()
+        retentionTask = Task {
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            model.applyRetention()
         }
     }
 

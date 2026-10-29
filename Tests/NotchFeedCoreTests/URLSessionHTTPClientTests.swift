@@ -44,6 +44,21 @@ struct URLSessionHTTPClientTests {
         #expect(String(decoding: data, as: UTF8.self) == "moved")
     }
 
+    @Test func boundsTheWholeFetchNotJustIdleTime() {
+        let configuration = URLSessionHTTPClient.defaultConfiguration()
+        #expect(configuration.timeoutIntervalForResource <= 120)
+        #expect(configuration.urlCache == nil)
+    }
+
+    @Test func acceptsResponsesUpToTheLimit() async throws {
+        StubURLProtocol.reset()
+        StubURLProtocol.respond(to: "https://ok.example.com/feed", body: String(repeating: "x", count: 1_024))
+        let small = URLSessionHTTPClient(configuration: StubURLProtocol.configuration(), maxResponseBytes: 1_024)
+
+        let (data, _) = try await small.data(for: URLRequest(url: URL(string: "https://ok.example.com/feed")!), allowsInsecure: false)
+        #expect(data.count == 1_024)
+    }
+
     @Test func rejectsOversizedResponses() async throws {
         StubURLProtocol.reset()
         StubURLProtocol.respond(to: "https://big.example.com/feed", body: String(repeating: "x", count: 2_048))

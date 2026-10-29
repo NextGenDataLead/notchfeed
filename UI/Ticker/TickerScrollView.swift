@@ -1,0 +1,223 @@
+import AppKit
+import QuartzCore
+
+/// One rendered item in the strip. `entry` is nil for a plain message such as "No feeds yet".
+struct TickerSegment {
+    let entry: HeadlineEntry?
+    let image: CGImage
+    let scale: CGFloat
+    let accessibilityLabel: String
+
+    var size: CGSize { CGSize(width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale) }
+}
+
+/// Continuous scroll on the compositor: the strip is a layer of pre-rendered items, moved by one
+/// linear Core Animation per loop. Clicks are hit-tested against the presentation layer.
+/// Changes that keep order and widths (read state) are swapped in place; others wait for the loop end.
+final class TickerScrollView: NSView {
+    /// Points per second; FR-1.4 makes speed a setting in V0.2.
+    static let speed: CGFloat = 40
+    static let gap: CGFloat = 28
+    private static let animationKey = "scroll"
+
+    var onActivate: ((HeadlineEntry) -> Void)?
+    var isPaused = false {
+        didSet { if isPaused != oldValue { applyPause() } }
+    }
+    var reduceMotion = false {
+        didSet { if reduceMotion != oldValue { rebuildLayers() } }
+    }
+
+    private let stripLayer = CALayer()
+    private var segments: [TickerSegment] = []
+    private var offsets: [CGFloat] = []
+    private var cycleWidth: CGFloat = 0
+    private var itemLayers: [[CALayer]] = []
+    private var pending: [TickerSegment]?
+    private var isScrolling = false
+    private var laidOutSize = CGSize.zero
+
+    init() {
+        super.init(frame: .zero)
+        wantsLayer = true
+        layer?.masksToBounds = true
+        stripLayer.anchorPoint = .zero
+        layer?.addSublayer(stripLayer)
+        setAccessibilityRole(.group)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { nil }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    func show(_ newSegments: [TickerSegment]) {
+        if !segments.isEmpty, newSegments.count == segments.count,
+           zip(newSegments, segments).allSatisfy({ $0.entry?.id == $1.entry?.id && $0.size == $1.size }) {
+            updateInPlace(newSegments)
+        } else if isScrolling, !isPaused {
+            pending = newSegments
+        } else {
+            apply(newSegments)
+        }
+    }
+
+    override func layout() {
+        super.layout()
+        guard bounds.size != laidOutSize else { return }
+        laidOutSize = bounds.size
+        rebuildLayers()
+    }
+
+    // MARK: Content
+
+    private func apply(_ newSegments: [TickerSegment]) {
+        pending = nil
+        segments = newSegments
+        var x: CGFloat = 0
+        offsets = newSegments.map { segment in
+            defer { x += segment.size.width + Self.gap }
+            return x
+        }
+        cycleWidth = x
+        rebuildLayers()
+    }
+
+    private func updateInPlace(_ newSegments: [TickerSegment]) {
+        segments = newSegments
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        for copy in itemLayers {
+            for (layer, segment) in zip(copy, newSegments) {
+                layer.contents = segment.image
+            }
+        }
+        CATransaction.commit()
+    }
+
+    private func rebuildLayers() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        stripLayer.removeAnimation(forKey: Self.animationKey)
+        stripLayer.speed = 1
+        stripLayer.timeOffset = 0
+        stripLayer.beginTime = 0
+        stripLayer.sublayers?.forEach { $0.removeFromSuperlayer() }
+
+        isScrolling = !reduceMotion && cycleWidth - Self.gap > bounds.width
+        let copies = isScrolling ? 2 : 1
+        itemLayers = (0..<copies).map { copy in
+            zip(segments, offsets).map { segment, offset in
+                let layer = CALayer()
+                layer.contents = segment.image
+                layer.contentsScale = segment.scale
+                layer.frame = CGRect(
+                    x: CGFloat(copy) * cycleWidth + offset,
+                    y: ((bounds.height - segment.size.height) / 2).rounded(),
+                    width: segment.size.width,
+                    height: segment.size.height
+                )
+                stripLayer.addSublayer(layer)
+                return layer
+            }
+        }
+        stripLayer.frame = CGRect(x: 0, y: 0, width: max(cycleWidth * CGFloat(copies), bounds.width), height: bounds.height)
+        CATransaction.commit()
+
+        if isScrolling { startCycle() }
+        if isPaused { applyPause() }
+        NSAccessibility.post(element: self, notification: .layoutChanged)
+    }
+
+    // MARK: Animation
+
+    private func startCycle() {
+        let animation = CABasicAnimation(keyPath: "transform.translation.x")
+        animation.fromValue = 0
+        animation.toValue = -cycleWidth
+        animation.duration = CFTimeInterval(cycleWidth / Self.speed)
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+        animation.delegate = self
+        stripLayer.add(animation, forKey: Self.animationKey)
+    }
+
+    private func applyPause() {
+        if isPaused {
+            let now = stripLayer.convertTime(CACurrentMediaTime(), from: nil)
+            stripLayer.speed = 0
+            stripLayer.timeOffset = now
+        } else {
+            let pausedAt = stripLayer.timeOffset
+            stripLayer.speed = 1
+            stripLayer.timeOffset = 0
+            stripLayer.beginTime = 0
+            stripLayer.beginTime = stripLayer.convertTime(CACurrentMediaTime(), from: nil) - pausedAt
+        }
+    }
+
+    private var currentTranslation: CGFloat {
+        (stripLayer.presentation()?.value(forKeyPath: "transform.translation.x") as? NSNumber).map { CGFloat($0.doubleValue) } ?? 0
+    }
+
+    // MARK: Clicks
+
+    override func mouseDown(with event: NSEvent) {
+        guard let index = segmentIndex(at: convert(event.locationInWindow, from: nil)),
+              let entry = segments[index].entry else { return }
+        onActivate?(entry)
+    }
+
+    private func segmentIndex(at point: CGPoint) -> Int? {
+        var x = point.x - currentTranslation
+        if isScrolling, cycleWidth > 0 {
+            x = x.truncatingRemainder(dividingBy: cycleWidth)
+            if x < 0 { x += cycleWidth }
+        }
+        return offsets.indices.first { x >= offsets[$0] && x < offsets[$0] + segments[$0].size.width }
+    }
+
+    // MARK: Accessibility (NFR-6)
+
+    override func accessibilityChildren() -> [Any]? {
+        let translation = currentTranslation
+        return segments.indices.map { index in
+            let segment = segments[index]
+            var x = offsets[index] + translation
+            if isScrolling, x < -segment.size.width { x += cycleWidth }
+            let frame = CGRect(x: x, y: 0, width: segment.size.width, height: bounds.height)
+            let element = TickerAccessibilityElement(label: segment.accessibilityLabel, frame: frame, parent: self) { [weak self] in
+                guard let entry = segment.entry else { return false }
+                self?.onActivate?(entry)
+                return true
+            }
+            return element
+        }
+    }
+}
+
+extension TickerScrollView: @preconcurrency CAAnimationDelegate {
+    func animationDidStop(_ animation: CAAnimation, finished: Bool) {
+        // `finished` is false when the animation was removed for a rebuild.
+        guard finished, isScrolling else { return }
+        if let pending {
+            apply(pending)
+        } else {
+            startCycle()
+        }
+    }
+}
+
+private final class TickerAccessibilityElement: NSAccessibilityElement {
+    private let press: () -> Bool
+
+    init(label: String, frame: CGRect, parent: NSView, press: @escaping () -> Bool) {
+        self.press = press
+        super.init()
+        setAccessibilityRole(.button)
+        setAccessibilityLabel(label)
+        setAccessibilityParent(parent)
+        setAccessibilityFrameInParentSpace(frame)
+    }
+
+    override func accessibilityPerformPress() -> Bool { press() }
+}

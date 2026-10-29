@@ -28,6 +28,7 @@ targets:
     platform: macOS
     sources:
       - App
+      - UI
       - Resources
     dependencies:
       - target: NotchFeedCore

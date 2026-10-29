@@ -4,7 +4,16 @@ NotchFeed is a native, open-source macOS app that keeps the latest headlines fro
 
 It runs entirely on your Mac: there's no account, no tracking and no server. MIT licence.
 
-> **Status:** V0.1 (walking skeleton) is in progress. It covers the pinned ticker bar, the menu bar item, adding feeds by URL, and launch at login.
+> **Status:** V0.1, the walking skeleton. The notch panel, alerts, ticker styles and OPML import follow in later versions; see the release plan in [PRD.md](PRD.md).
+
+## What V0.1 does
+
+- **Ticker bar.** A thin bar under the menu bar (or above the Dock) scrolls the 50 newest headlines with favicon, feed name and age. Click a headline to open it in your browser; read items are dimmed. The bar stays off full-screen apps.
+- **Menu bar item.** Shows the unread count and the 20 newest items, with Refresh Now, Pause Ticker, Settings and Quit.
+- **Feeds.** Add a feed by its URL. NotchFeed checks it before saving, prefers https, and only uses plain http for a feed if you allow it.
+- **Fetching.** RSS 2.0, RSS 1.0 and Atom, with a lenient parser for broken feeds. NotchFeed uses conditional requests, honours Retry-After, runs at most 6 fetches at once, and refreshes every 15 minutes.
+- **Storage.** Feeds, headlines and read state survive restarts. Items older than 30 days (configurable) are removed.
+- **Launch at login**, Reduce Motion support and VoiceOver labels.
 
 ## Requirements
 
@@ -29,7 +38,13 @@ xcodebuild -project NotchFeed.xcodeproj -scheme NotchFeed -derivedDataPath build
 
 The Xcode project is generated from `project.yml` and isn't committed. Builds get an ad-hoc signature only, so NotchFeed is meant to be built and run locally.
 
-NotchFeed is an accessory app, so it has no Dock icon. Look for the newspaper icon in the menu bar.
+NotchFeed is an accessory app, so it has no Dock icon. Look for the newspaper icon in the menu bar and choose **Settings…** to add feeds. For **Open at login**, copy the app to `/Applications` first.
+
+Data lives in `~/Library/Application Support/NotchFeed/`.
+
+## Privacy
+
+NotchFeed only connects to the feeds you add and their sites (for favicons). It has no analytics. Plain http is refused unless you allow it for a specific feed.
 
 ## Licence
 

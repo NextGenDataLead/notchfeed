@@ -34,7 +34,7 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 
 ### First launch
 
-- [ ] 1. A thin dark bar runs the full width of the screen, directly under the menu bar (also beside the notch), with no gap and no overlap. It says "No feeds yet. Add some in NotchFeed Settings."
+- [ ] 1. A thin dark bar runs the full width of the screen, directly under the menu bar, with no gap and no overlap. On a MacBook with a notch it runs below the notch too, not beside it. (Nothing appears beside the notch until the notch panel in V0.4.) It says "No feeds yet. Add some in NotchFeed Settings."
 - [ ] 2. The menu bar shows a newspaper icon with no count, and there's no Dock icon.
 - [ ] 3. Menu › **Settings…** opens the Settings window in front of other apps, with **General** and **Feeds** tabs.
 

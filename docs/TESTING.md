@@ -41,7 +41,7 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 ### Adding feeds (FR-4.1)
 
 - [ ] 4. In **Feeds**, add these 10 one at a time. Each appears in the list with its name within a few seconds, and gets its favicon shortly after:
-  `https://feeds.nos.nl/nosnieuwsalgemeen`, `https://hnrss.org/frontpage`, `https://daringfireball.net/feeds/main`, `https://rss.slashdot.org/Slashdot/slashdotMain`, `https://www.theverge.com/rss/index.xml`, `https://feeds.feedburner.com/tweakers/mixed`, `https://feeds.arstechnica.com/arstechnica/index`, `https://feeds.bbci.co.uk/news/rss.xml`, `https://www.nu.nl/rss/Algemeen`, `https://9to5mac.com/feed/`
+  `https://feeds.nos.nl/nosnieuwsalgemeen`, `https://hnrss.org/frontpage`, `https://daringfireball.net/feeds/main`, `https://rss.slashdot.org/Slashdot/slashdotMain`, `https://www.theverge.com/rss/index.xml`, `https://tweakers.net/feeds/mixed.xml`, `https://feeds.arstechnica.com/arstechnica/index`, `https://feeds.bbci.co.uk/news/rss.xml`, `https://www.nu.nl/rss/Algemeen`, `https://9to5mac.com/feed/`
 - [ ] 5. `https://example.com` shows "This address is a web page, not an RSS or Atom feed…" and isn't added.
 - [ ] 6. `not a url` shows "Enter a feed address…". Adding `hnrss.org/frontpage` again shows "You already follow this feed."
 - [ ] 7. `http://neverssl.com` (a site that serves no feed over https) shows the orange insecure warning, and **Add** stays disabled until **Allow insecure connection for this feed** is ticked. After ticking it and pressing **Add**, it fails with "web page, not a feed" (expected: that site is a page, not a feed). Nothing is added.

@@ -5,11 +5,14 @@ struct NotchFeedApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("NotchFeed", systemImage: "newspaper") {
-            Button("Quit NotchFeed") {
-                NSApplication.shared.terminate(nil)
+        MenuBarExtra {
+            if let model = appDelegate.model {
+                MenuBarContent(model: model)
+            } else {
+                QuitButton()
             }
-            .keyboardShortcut("q")
+        } label: {
+            MenuBarLabel(model: appDelegate.model)
         }
     }
 }

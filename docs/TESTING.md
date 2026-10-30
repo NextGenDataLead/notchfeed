@@ -71,11 +71,14 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 
 ### General tab (FR-9.1, 9.2, 1.2)
 
-- [ ] 15. **Show feed name** off removes the feed names from the bar; on brings them back.
-- [ ] 16. **Show unread count** off leaves only the icon.
-- [ ] 17. **Position › Bottom** moves the bar to just above the Dock (try with the Dock hidden and on the left too); **Top** moves it back.
+- [ ] 15. **Show feed name** off removes the feed names from the bar; on brings them back, both within about a second.
+  *First try: it worked, but only at the end of the scroll loop. Setting changes now apply at once, with the item at the left edge kept in place; retest open.*
+- [x] 16. **Show unread count** off leaves only the icon.
+- [x] 17. **Position › Bottom** moves the bar to just above the Dock (try with the Dock hidden and on the left too); **Top** moves it back.
 - [ ] 18. With the external display connected, **Display › (external)** moves the bar there. Unplugging moves it to the built-in display, and the setting shows "(not connected)". Plugging back in moves it back.
+  *Skipped for now (2026-10-30).*
 - [ ] 19. **Open NotchFeed at login**: copy `NotchFeed.app` to `/Applications`, open it from there, turn the toggle on, log out and in. NotchFeed starts. (If macOS asks, allow it in Login Items.) Turn it off again when done.
+  *Skipped for now (2026-10-30).*
 
 ### Restart and accessibility (FR-4.6, NFR-5, NFR-6)
 

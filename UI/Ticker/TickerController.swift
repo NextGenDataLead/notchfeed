@@ -86,7 +86,8 @@ final class TickerController {
         }
         panel.setFrame(TickerPositioner.frame(on: geometry, position: current.position), display: true)
         updateVisibility()
-        if feedNameChanged || force { render() }
+        // A setting the user just changed shows at once (FR-9.1); a screen change has to anyway.
+        if feedNameChanged || force { render(immediately: true) }
     }
 
     /// FR-1.1: hidden while a full-screen app is in front on the ticker's display.
@@ -118,7 +119,7 @@ final class TickerController {
         }
     }
 
-    private func render() {
+    private func render(immediately: Bool = false) {
         let scale = panel.backingScaleFactor
         let showFeedName = placement?.showFeedName ?? AppDefaults.showFeedName
         let now = model.now
@@ -139,7 +140,7 @@ final class TickerController {
         }
         // Pause state first: a resume must not look like "not scrolling" and apply content mid-loop.
         scrollView.isPaused = model.isTickerPaused
-        scrollView.show(segments)
+        scrollView.show(segments, immediately: immediately)
     }
 
     private func segment(for entry: HeadlineEntry, age: String, showFeedName: Bool, scale: CGFloat, now: Date) -> TickerSegment? {

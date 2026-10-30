@@ -54,16 +54,17 @@ final class TickerScrollView: NSView {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
     /// While scrolling (paused or not), anything that would move items waits for the loop end,
-    /// so the strip never jumps under the reader.
-    func show(_ newSegments: [TickerSegment]) {
+    /// so the strip never jumps under the reader. `immediately` is for changes the user just made
+    /// in Settings: they apply at once, and the item at the left edge stays where it is.
+    func show(_ newSegments: [TickerSegment], immediately: Bool = false) {
         dimReadItems(in: newSegments)
         if pending == nil, !segments.isEmpty, newSegments.count == segments.count,
            zip(newSegments, segments).allSatisfy({ $0.entry?.id == $1.entry?.id && $0.size == $1.size }) {
             updateInPlace(newSegments)
-        } else if isScrolling {
+        } else if isScrolling, !immediately {
             pending = newSegments
         } else {
-            apply(newSegments)
+            apply(newSegments, keeping: leadingItem())
         }
     }
 
@@ -76,7 +77,9 @@ final class TickerScrollView: NSView {
 
     // MARK: Content
 
-    private func apply(_ newSegments: [TickerSegment]) {
+    /// - Parameter anchor: an item and the distance of its left edge from the view's left edge;
+    ///   the loop resumes with that item at the same spot. Without it the loop starts over.
+    private func apply(_ newSegments: [TickerSegment], keeping anchor: (id: String, x: CGFloat)? = nil) {
         pending = nil
         segments = newSegments
         var x: CGFloat = 0
@@ -85,7 +88,23 @@ final class TickerScrollView: NSView {
             return x
         }
         cycleWidth = x
-        rebuildLayers()
+
+        var phase: CGFloat = 0
+        if let anchor, cycleWidth > 0, let index = newSegments.firstIndex(where: { $0.entry?.id == anchor.id }) {
+            phase = (offsets[index] - anchor.x).truncatingRemainder(dividingBy: cycleWidth)
+            if phase < 0 { phase += cycleWidth }
+        }
+        rebuildLayers(phase: phase)
+    }
+
+    /// The first item whose right edge is in view, while scrolling.
+    private func leadingItem() -> (id: String, x: CGFloat)? {
+        guard isScrolling, cycleWidth > 0 else { return nil }
+        var start = (-currentTranslation).truncatingRemainder(dividingBy: cycleWidth)
+        if start < 0 { start += cycleWidth }
+        guard let index = offsets.indices.first(where: { offsets[$0] + segments[$0].size.width > start }),
+              let id = segments[index].entry?.id else { return nil }
+        return (id, offsets[index] - start)
     }
 
     private func updateInPlace(_ newSegments: [TickerSegment]) {
@@ -113,7 +132,7 @@ final class TickerScrollView: NSView {
         }
     }
 
-    private func rebuildLayers() {
+    private func rebuildLayers(phase: CGFloat = 0) {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         stripLayer.removeAnimation(forKey: Self.animationKey)
@@ -141,20 +160,22 @@ final class TickerScrollView: NSView {
             }
         }
         stripLayer.frame = CGRect(x: 0, y: 0, width: max(cycleWidth * CGFloat(copies), bounds.width), height: bounds.height)
+        // In the same transaction, so a resumed loop never shows a frame at the start position.
+        if isScrolling { startCycle(from: phase) }
+        if isPaused { applyPause() }
         CATransaction.commit()
 
-        if isScrolling { startCycle() }
-        if isPaused { applyPause() }
         NSAccessibility.post(element: self, notification: .layoutChanged)
     }
 
     // MARK: Animation
 
-    private func startCycle() {
+    /// One loop, or the rest of one when `phase` (points already scrolled) is above zero.
+    private func startCycle(from phase: CGFloat = 0) {
         let animation = CABasicAnimation(keyPath: "transform.translation.x")
-        animation.fromValue = 0
+        animation.fromValue = -phase
         animation.toValue = -cycleWidth
-        animation.duration = CFTimeInterval(cycleWidth / Self.speed)
+        animation.duration = CFTimeInterval((cycleWidth - phase) / Self.speed)
         animation.timingFunction = CAMediaTimingFunction(name: .linear)
         animation.delegate = self
         stripLayer.add(animation, forKey: Self.animationKey)

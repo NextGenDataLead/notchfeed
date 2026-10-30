@@ -20,8 +20,15 @@ public enum FeedParser {
             .max { $0.items.count < $1.items.count }
         if let best { return finish(best, baseURL: baseURL) }
 
-        if first.hasUnknownRoot || repaired.hasUnknownRoot { throw .notAFeed }
+        if first.hasUnknownRoot || repaired.hasUnknownRoot || looksLikeHTML(data) { throw .notAFeed }
         throw .malformed
+    }
+
+    /// Most real pages are HTML5, which XMLParser rejects before it sees the root element
+    /// (unquoted attributes, void tags), so check the start of the document as well.
+    private static func looksLikeHTML(_ data: Data) -> Bool {
+        let head = String(decoding: data.prefix(1_024), as: UTF8.self).lowercased()
+        return head.contains("<!doctype html") || head.contains("<html")
     }
 
     private static func finish(_ feed: ParsedFeed, baseURL: URL?) -> ParsedFeed {

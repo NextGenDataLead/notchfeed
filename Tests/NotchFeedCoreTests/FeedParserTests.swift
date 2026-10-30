@@ -145,9 +145,16 @@ struct FeedParserTests {
         #expect(feed.items.map(\.title) == ["After a BOM", "Stray control char and ref"])
     }
 
-    @Test func rejectsHTMLPage() throws {
+    @Test(arguments: ["not-a-feed.html", "not-a-feed-html5.html"])
+    func rejectsHTMLPage(fixture: String) throws {
         #expect(throws: FeedParserError.notAFeed) {
-            try parse("not-a-feed.html")
+            try parse(fixture)
+        }
+    }
+
+    @Test func brokenXMLThatIsNotHTMLIsMalformed() {
+        #expect(throws: FeedParserError.malformed) {
+            try FeedParser.parse(Data("<?xml version=\"1.0\"?>\n<".utf8), baseURL: nil)
         }
     }
 

@@ -27,7 +27,7 @@
       }
     },
     "%lld+" : {
-
+      "comment" : "Unread badge for more than 99 items"
     },
     "%lldd" : {
       "comment" : "Age in days, compact"

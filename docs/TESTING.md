@@ -54,7 +54,7 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 
 ### Menu bar (FR-5.1, 5.2)
 
-- [ ] 11. The icon shows the unread count, and it drops by one after clicking a headline.
+- [ ] 11. The icon shows the unread count as a small badge in its bottom-right corner ("99+" above 99), readable in light and dark mode. The icon stays visible beside the notch. Below 100 unread, the number drops by one after clicking a headline.
 - [ ] 12. The dropdown lists the 20 newest items, unread ones with a dot. Clicking one opens it and marks it read.
 - [ ] 13. **Pause Ticker** freezes the scroll and the item becomes **Resume Ticker**; resuming continues from the same spot. Clicking a headline while paused still works.
 - [ ] 14. **Refresh Now** updates the "Updated …" times in the Feeds tab.

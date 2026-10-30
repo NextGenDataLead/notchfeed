@@ -2,22 +2,16 @@ import AppKit
 import NotchFeedCore
 import SwiftUI
 
-/// FR-5.1: the icon, with the unread count when that setting is on.
+/// FR-5.1: the icon, with the unread count as a badge when that setting is on.
 struct MenuBarLabel: View {
-    private static let maxCount = 999
-
     let model: AppModel?
     @AppStorage(AppSettings.Key.showUnreadCount) private var showUnreadCount = AppDefaults.showUnreadCount
 
     var body: some View {
-        if let count = model?.unreadCount, showUnreadCount, count > 0 {
-            Label {
-                Text(count > Self.maxCount ? String(localized: "\(Self.maxCount)+") : String(count))
-            } icon: {
-                Image(systemName: "newspaper")
-            }
-            .labelStyle(.titleAndIcon)
-            .accessibilityLabel(String(localized: "NotchFeed, \(count) unread"))
+        if let count = model?.unreadCount, showUnreadCount,
+           let badge = UnreadBadge(unread: count), let icon = MenuBarIcon.image(badge: badge) {
+            Image(nsImage: icon)
+                .accessibilityLabel(String(localized: "NotchFeed, \(count) unread"))
         } else {
             Image(systemName: "newspaper")
                 .accessibilityLabel("NotchFeed")

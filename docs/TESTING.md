@@ -71,8 +71,8 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 
 ### General tab (FR-9.1, 9.2, 1.2)
 
-- [ ] 15. **Show feed name** off removes the feed names from the bar; on brings them back, both within about a second.
-  *First try: it worked, but only at the end of the scroll loop. Setting changes now apply at once, with the item at the left edge kept in place; retest open.*
+- [x] 15. **Show feed name** off removes the feed names from the bar; on brings them back, both within about a second.
+  *First try: it worked, but only at the end of the scroll loop. Setting changes now apply at once, with the item at the left edge kept in place (4416645); retest passed.*
 - [x] 16. **Show unread count** off leaves only the icon.
 - [x] 17. **Position › Bottom** moves the bar to just above the Dock (try with the Dock hidden and on the left too); **Top** moves it back.
 - [ ] 18. With the external display connected, **Display › (external)** moves the bar there. Unplugging moves it to the built-in display, and the setting shows "(not connected)". Plugging back in moves it back.
@@ -83,7 +83,7 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 ### Restart and accessibility (FR-4.6, NFR-5, NFR-6)
 
 - [x] 20. Quit from the menu and reopen. All feeds, headlines and read (dimmed) state are still there, and headlines show within about a second, before any refresh.
-- [ ] 21. Turn on **Reduce motion** in System Settings (type "Reduce motion" in the search field; it's under Accessibility). The bar stops scrolling. Turn it off: the bar scrolls again.
-- [ ] 22. VoiceOver reads ticker items. Pause the ticker (menu › **Pause Ticker**) so items stay put. Turn on VoiceOver in System Settings › Accessibility › VoiceOver. Point the mouse at a headline and press Control-Option-Command-F5 (add fn if the F-keys control brightness and volume) to move the VoiceOver cursor there. It reads "Feed: headline, 5 minutes ago". Control-Option-Space opens the item. Turn VoiceOver off and resume the ticker.
+- [x] 21. Turn on **Reduce motion** in System Settings (type "Reduce motion" in the search field; it's under Accessibility). The bar stops scrolling. Turn it off: the bar scrolls again.
+- [x] 22. VoiceOver reads ticker items. Pause the ticker (menu › **Pause Ticker**) so items stay put. Turn on VoiceOver in System Settings › Accessibility › VoiceOver. Point the mouse at a headline and press Control-Option-Command-F5 (add fn if the F-keys control brightness and volume) to move the VoiceOver cursor there. It reads "Feed: headline, 5 minutes ago". Control-Option-Space opens the item. Turn VoiceOver off and resume the ticker.
 
 **Done when** (PRD V0.1): 10 feeds added, headlines scroll in a pinned top bar, click opens the browser, and everything survives a restart.

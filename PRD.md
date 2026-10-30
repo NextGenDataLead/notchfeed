@@ -79,12 +79,13 @@ IDs (FR-x) are stable so the release plan and Claude Code tasks can reference th
 | FR-1.2 | Position: top under menu bar (default), or bottom above Dock; choice of display when several are connected | V0.1 |
 | FR-1.3 | Display style: continuous scroll, one-at-a-time with fade, one-at-a-time with slide, or static list of latest N | V0.2 |
 | FR-1.4 | Scroll speed, rotation interval and pause-on-hover settings | V0.2 |
-| FR-1.5 | Pinned or unpinned; unpinned behaviours from Key concepts, combinable | V0.3 |
+| FR-1.5 | Pinned or unpinned; unpinned behaviours from Key concepts, combinable | V0.2 |
 | FR-1.6 | Overlap handling: overlap windows, thin and translucent (opacity slider), or bottom placement | V0.2 |
 | FR-1.7 | Height, font size and theme (system, light, dark) | V0.2 |
 | FR-1.8 | Each item shows feed favicon, feed name (optional), headline and relative age | V0.1 |
 | FR-1.9 | Click opens the item in the default browser and marks it read; right-click menu: mark read, save for later, mute feed, copy link | V0.1 / V0.3 |
 | FR-1.10 | Filter what the ticker shows: all, unread only, or selected feeds or folders | V0.3 |
+| FR-1.11 | Mouse-dodge: when the pointer moves into the bar, it fades out and lets clicks through to the window below. Resting on it for about 0.6 s, or holding ⌥, makes it solid and clickable again, with a visible cue. Each trigger can be turned off | V0.2 |
 
 ### FR-2 Notch panel
 
@@ -112,14 +113,14 @@ IDs (FR-x) are stable so the release plan and Claude Code tasks can reference th
 
 | ID | Requirement | Version |
 | --- | --- | --- |
-| FR-4.1 | Add a feed by feed URL, or by website URL with automatic feed discovery | V0.1 / V0.2 |
-| FR-4.2 | Folders (groups) for feeds | V0.2 |
+| FR-4.1 | Add a feed by feed URL, or by website URL with automatic feed discovery | V0.1 / V0.3 |
+| FR-4.2 | Folders (groups) for feeds | V0.3 |
 | FR-4.3 | Priority per feed: Alert, Ticker only, Muted; default per folder | V0.3 |
 | FR-4.4 | Global keyword list (case-insensitive, whole word optional); a match raises an item to Alert | V0.3 |
 | FR-4.5 | Mute keywords: items matching are hidden everywhere | V0.5 |
 | FR-4.6 | Read state, deduplication by GUID or link, retention limit (default 30 days, configurable) | V0.1 |
 | FR-4.7 | Save for later list | V0.3 |
-| FR-4.8 | OPML import and export | V0.2 |
+| FR-4.8 | OPML import and export | V0.3 |
 | FR-4.9 | Feed health: show last fetch, errors, and feeds that have not updated in N days | V0.5 |
 
 ### FR-5 Menu bar item
@@ -150,8 +151,8 @@ IDs (FR-x) are stable so the release plan and Claude Code tasks can reference th
 | --- | --- | --- |
 | FR-8.1 | Parse RSS 2.0, RSS 1.0 and Atom; tolerate common malformed XML and date formats; JSON Feed later | V0.1 |
 | FR-8.2 | Conditional requests (ETag, If-Modified-Since); honour HTTP 304 and 429 Retry-After | V0.1 |
-| FR-8.3 | Refresh interval global (default 15 min) and per feed; spread fetches over the interval instead of all at once | V0.2 |
-| FR-8.4 | Back-off on errors; pause fetching on low power mode or when offline | V0.2 |
+| FR-8.3 | Refresh interval global (default 15 min) and per feed; spread fetches over the interval instead of all at once | V0.3 |
+| FR-8.4 | Back-off on errors; pause fetching on low power mode or when offline | V0.3 |
 | FR-8.5 | Concurrency limit (e.g. 6 parallel requests) | V0.1 |
 
 ### FR-9 Settings and presets
@@ -237,8 +238,8 @@ V1.0 is reached in five pre-releases, each usable on its own; versions follow Se
 | Version | Theme | Scope (requirement IDs) | Done when |
 | --- | --- | --- | --- |
 | V0.1 | Walking skeleton | FR-1.1, 1.2, 1.8, 1.9 (click), 4.1 (feed URL), 4.6, 5.1, 5.2 (basic), 8.1, 8.2, 8.5, 9.1 (General, Feeds), 9.2 | Add 10 feeds, see headlines scroll in a pinned top bar, click opens browser, survives restart |
-| V0.2 | Ticker styles and feed management | FR-1.3, 1.4, 1.6, 1.7, 4.1 (discovery), 4.2, 4.8, 7.4, 8.3, 8.4, 9.4 | Import an OPML with 100+ feeds; switch between scroll, fade, slide and static; idle CPU within NFR-1 |
-| V0.3 | Rules, alerts and staying out of the way | FR-1.5, 1.9 (menu), 1.10, 3.1 to 3.5, 4.3, 4.4, 4.7, 5.2 (snooze), 6.1, 7.1 to 7.3 | Keyword match triggers one native notification; 20 new items give at most one batch alert; ticker hides during a Zoom share |
+| V0.2 | Ticker UX | FR-1.3, 1.4, 1.5, 1.6, 1.7, 1.11, 7.4, 9.4 | Switch between scroll, fade, slide and static; an unpinned bar appears on new items and hides again; a zoomed window's title bar under the bar can be dragged after a pass of the pointer; idle CPU within NFR-1 |
+| V0.3 | Feeds, rules and alerts | FR-1.9 (menu), 1.10, 3.1 to 3.5, 4.1 (discovery), 4.2, 4.3, 4.4, 4.7, 4.8, 5.2 (snooze), 6.1, 7.1 to 7.3, 8.3, 8.4 | Import an OPML with 100+ feeds; keyword match triggers one native notification; 20 new items give at most one batch alert; ticker hides during a Zoom share |
 | V0.4 | Notch panel | FR-2.1 to 2.5 | Hover notch shows latest items; idle ears show unread count; external display uses top-centre fallback |
 | V0.5 | Polish and presets | FR-2.6, 4.5, 4.9, 9.3; all NFRs measured | One-click switch between presets; NFR-1 to NFR-6 verified and logged |
 | V1.0 | Stable | Bug fixes, data migration framework, README with build-from-source steps and screenshots; no signing, local builds only | Used daily for two weeks without crashes or lost read state |
@@ -280,7 +281,7 @@ These items are worth considering but are not planned in any version yet. An ite
 
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
-| macOS cannot reserve screen space for the bar | Bar covers window title bars and tabs | Bottom placement, translucency and unpinned modes (FR-1.5, 1.6) |
+| macOS cannot reserve screen space for the bar | Bar covers window title bars and tabs | Bottom placement, translucency, unpinned modes and mouse-dodge (FR-1.5, 1.6, 1.11) |
 | Screen-share hiding is unreliable: newer macOS capture APIs may ignore `sharingType = .none` | Headlines visible in a meeting | Also detect known call and capture apps and hide; manual hide hotkey (FR-7.4); test on macOS 14, 15 and 26 |
 | Notch panel clashes with other notch apps (NotchNest, Boring Notch) | Overlapping panels, odd hover behaviour | Setting to disable the notch surface; document the conflict |
 | Malformed feeds and odd date formats | Missing or misordered items | Lenient parser, fixture tests from real feeds, FeedKit fallback |

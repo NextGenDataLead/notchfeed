@@ -6,11 +6,13 @@ Native, open-source macOS app (MIT) that keeps the latest RSS/Atom headlines in 
 
 ## Current version
 
-**Working on: V0.1 — Walking skeleton**
+**Working on: V0.2 — Ticker UX** (V0.1 tagged 2026-10-30; manual checks 18 and 19 still to run)
 
-Scope (from PRD release plan): FR-1.1, 1.2, 1.8, 1.9 (click only), 4.1 (feed URL only), 4.6, 5.1, 5.2 (basic), 8.1, 8.2, 8.5, 9.1 (General and Feeds tabs), 9.2.
+Scope (from PRD release plan): FR-1.3, 1.4, 1.5, 1.6, 1.7, 1.11, 7.4, 9.4. Settings for these go in a new Ticker tab (FR-9.1).
 
-Done when: the user can add 10 feeds, see headlines scroll in a pinned top bar, click a headline to open it in the browser, and everything survives a restart.
+Done when: the user can switch between scroll, fade, slide and static; an unpinned bar appears on new items and hides again; a zoomed window's title bar under the bar can be dragged after a pass of the pointer; idle CPU is within NFR-1.
+
+Not started yet: begin with a plan-mode round (FRs, files, order) and wait for the go-ahead. KeyboardShortcuts (approved dependency) arrives with FR-9.4.
 
 Update this section when a version is tagged and the next one starts.
 

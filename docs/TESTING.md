@@ -82,8 +82,8 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 
 ### Restart and accessibility (FR-4.6, NFR-5, NFR-6)
 
-- [ ] 20. Quit from the menu and reopen. All feeds, headlines and read (dimmed) state are still there, and headlines show within about a second, before any refresh.
-- [ ] 21. System Settings › Accessibility › Display › **Reduce motion** on: the bar stops scrolling. Off: it scrolls again.
-- [ ] 22. VoiceOver (⌘F5): moving to the bar reads items as "Feed: headline, 5 minutes ago". VO-Space opens the item.
+- [x] 20. Quit from the menu and reopen. All feeds, headlines and read (dimmed) state are still there, and headlines show within about a second, before any refresh.
+- [ ] 21. Turn on **Reduce motion** in System Settings (type "Reduce motion" in the search field; it's under Accessibility). The bar stops scrolling. Turn it off: the bar scrolls again.
+- [ ] 22. VoiceOver reads ticker items. Pause the ticker (menu › **Pause Ticker**) so items stay put. Turn on VoiceOver in System Settings › Accessibility › VoiceOver. Point the mouse at a headline and press Control-Option-Command-F5 (add fn if the F-keys control brightness and volume) to move the VoiceOver cursor there. It reads "Feed: headline, 5 minutes ago". Control-Option-Space opens the item. Turn VoiceOver off and resume the ticker.
 
 **Done when** (PRD V0.1): 10 feeds added, headlines scroll in a pinned top bar, click opens the browser, and everything survives a restart.

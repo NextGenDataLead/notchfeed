@@ -19,6 +19,7 @@ Tests never hit the network. Fixture feeds live in `Tests/Fixtures/`; the real-w
 | `RefreshCoordinatorTests` | At most 6 fetches in flight, validators and errors stored, Retry-After window skipped, favicons |
 | `SubscribeTests` | Input normalisation, https first, per-feed http opt-in, duplicates, non-feed pages |
 | `TickerPositionerTests`, `RelativeAgeTests`, `AppSettingsTests` | Bar placement (notch menu bar, Dock, auto-hidden menu bar, external display, fallback), age buckets, setting defaults |
+| `FullScreenDetectorTests` | Full screen vs. zoomed window (window lists measured on macOS 26), Space-switch animation, external display, auto-hidden menu bar |
 
 ## Manual checklist: V0.1
 
@@ -53,17 +54,20 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 
 ### Ticker (FR-1.1, 1.2, 1.8, 1.9)
 
-- [ ] 8. Headlines scroll smoothly from right to left. Each shows favicon, feed name, headline and age ("5m", "2h", "3d"), newest first.
+- [x] 8. Headlines scroll smoothly from right to left. Each shows favicon, feed name, headline and age ("5m", "2h", "3d"), newest first.
 - [ ] 9. Clicking a headline opens it in the default browser. The app you were in keeps focus, and the headline dims within about a second.
+  *First try: the browser opened but the headline didn't dim. The item was marked read, but the bar held every change until the end of its loop, which takes minutes with 50 headlines. Read state is now applied at once. Retest open.*
 - [ ] 10. Open a full-screen app (Safari, green button). The bar isn't shown in that Space; back on the desktop it is. It also shows on every desktop Space.
+  *First try: the bar showed over full-screen Safari and covered its toolbar, because macOS 26 puts the panel on full-screen Spaces anyway. The ticker now detects full screen from the window list and hides (see DECISIONS.md). Verified with a test window going full screen; retest with Safari open.*
+  *Also seen: the bar covers the title bar of a window that fills the screen (VS Code), so the window can't be dragged there. This is expected in V0.1, because macOS can't reserve screen space for a bar (PRD risks). Workarounds: Position › Bottom, or move the window from its Window menu. Overlap handling is FR-1.6 (V0.2).*
 
 ### Menu bar (FR-5.1, 5.2)
 
-- [ ] 11. The icon shows the unread count as a small badge in its bottom-right corner ("99+" above 99), readable in light and dark mode. The icon stays visible beside the notch. Below 100 unread, the number drops by one after clicking a headline.
-  *Text count ("296") made the item too wide and macOS hid it beside the notch. Now a badge (18f97d1): visible and readable, confirmed 2026-10-30. The count dropping after a click is still to test.*
-- [ ] 12. The dropdown lists the 20 newest items, unread ones with a dot. Clicking one opens it and marks it read.
-- [ ] 13. **Pause Ticker** freezes the scroll and the item becomes **Resume Ticker**; resuming continues from the same spot. Clicking a headline while paused still works.
-- [ ] 14. **Refresh Now** updates the "Updated …" times in the Feeds tab.
+- [x] 11. The icon shows the unread count as a small badge in its bottom-right corner ("99+" above 99), readable in light and dark mode. The icon stays visible beside the notch. Below 100 unread, the number drops by one after clicking a headline.
+  *Text count ("296") made the item too wide and macOS hid it beside the notch. Now a badge (18f97d1): visible and readable, confirmed 2026-10-30. With 296 unread the badge stays at "99+", so the count dropping after a click was checked in the database instead: 5 clicks, 5 items read.*
+- [x] 12. The dropdown lists the 20 newest items, unread ones with a dot. Clicking one opens it and marks it read.
+- [x] 13. **Pause Ticker** freezes the scroll and the item becomes **Resume Ticker**; resuming continues from the same spot. Clicking a headline while paused still works.
+- [x] 14. **Refresh Now** updates the "Updated …" times in the Feeds tab.
 
 ### General tab (FR-9.1, 9.2, 1.2)
 

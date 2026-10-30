@@ -32,17 +32,22 @@ open build/Build/Products/Debug/NotchFeed.app
 
 To start from an empty database, quit NotchFeed and delete `~/Library/Application Support/NotchFeed/`.
 
+**Current run:** started 2026-10-29 on macOS 26.5.2, MacBook with notch. Ticked items passed; notes in *italics* say what was found and fixed during the run.
+
 ### First launch
 
-- [ ] 1. A thin dark bar runs the full width of the screen, directly under the menu bar, with no gap and no overlap. On a MacBook with a notch it runs below the notch too, not beside it. (Nothing appears beside the notch until the notch panel in V0.4.) It says "No feeds yet. Add some in NotchFeed Settings."
-- [ ] 2. The menu bar shows a newspaper icon with no count, and there's no Dock icon.
-- [ ] 3. Menu › **Settings…** opens the Settings window in front of other apps, with **General** and **Feeds** tabs.
+- [x] 1. A thin dark bar runs the full width of the screen, directly under the menu bar, with no gap and no overlap. On a MacBook with a notch it runs below the notch too, not beside it. (Nothing appears beside the notch until the notch panel in V0.4.) It says "No feeds yet. Add some in NotchFeed Settings."
+  *Check wording fixed: the bar runs below the notch, not beside it.*
+- [x] 2. The menu bar shows a newspaper icon with no count, and there's no Dock icon.
+- [x] 3. Menu › **Settings…** opens the Settings window in front of other apps, with **General** and **Feeds** tabs.
 
 ### Adding feeds (FR-4.1)
 
-- [ ] 4. In **Feeds**, add these 10 one at a time. Each appears in the list with its name within a few seconds, and gets its favicon shortly after:
+- [x] 4. In **Feeds**, add these 10 one at a time. Each appears in the list with its name within a few seconds, and gets its favicon shortly after:
   `https://feeds.nos.nl/nosnieuwsalgemeen`, `https://hnrss.org/frontpage`, `https://daringfireball.net/feeds/main`, `https://rss.slashdot.org/Slashdot/slashdotMain`, `https://www.theverge.com/rss/index.xml`, `https://tweakers.net/feeds/mixed.xml`, `https://feeds.arstechnica.com/arstechnica/index`, `https://feeds.bbci.co.uk/news/rss.xml`, `https://www.nu.nl/rss/Algemeen`, `https://9to5mac.com/feed/`
+  *Passed with the old FeedBurner Tweakers URL, which stopped updating in April 2025 (all items past retention, so 0 headlines). Replaced by Tweakers' own feed; re-adding it is still to do.*
 - [ ] 5. `https://example.com` shows "This address is a web page, not an RSS or Atom feed…" and isn't added.
+  *First try showed "The feed couldn't be read": HTML5 pages weren't recognised. Fixed in 799d746; retest pending.*
 - [ ] 6. `not a url` shows "Enter a feed address…". Adding `hnrss.org/frontpage` again shows "You already follow this feed."
 - [ ] 7. `http://neverssl.com` (a site that serves no feed over https) shows the orange insecure warning, and **Add** stays disabled until **Allow insecure connection for this feed** is ticked. After ticking it and pressing **Add**, it fails with "web page, not a feed" (expected: that site is a page, not a feed). Nothing is added.
 
@@ -55,6 +60,7 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 ### Menu bar (FR-5.1, 5.2)
 
 - [ ] 11. The icon shows the unread count as a small badge in its bottom-right corner ("99+" above 99), readable in light and dark mode. The icon stays visible beside the notch. Below 100 unread, the number drops by one after clicking a headline.
+  *Text count ("296") made the item too wide and macOS hid it beside the notch. Now a badge (18f97d1): visible and readable, confirmed 2026-10-30. The count dropping after a click is still to test.*
 - [ ] 12. The dropdown lists the 20 newest items, unread ones with a dot. Clicking one opens it and marks it read.
 - [ ] 13. **Pause Ticker** freezes the scroll and the item becomes **Resume Ticker**; resuming continues from the same spot. Clicking a headline while paused still works.
 - [ ] 14. **Refresh Now** updates the "Updated …" times in the Feeds tab.

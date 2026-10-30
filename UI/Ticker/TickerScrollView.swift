@@ -9,11 +9,13 @@ struct TickerSegment {
     let accessibilityLabel: String
 
     var size: CGSize { CGSize(width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale) }
+    var opacity: Float { entry?.isRead == true ? TickerStyle.readOpacity : 1 }
 }
 
 /// Continuous scroll on the compositor: the strip is a layer of pre-rendered items, moved by one
 /// linear Core Animation per loop. Clicks are hit-tested against the presentation layer.
-/// Changes that keep order and widths (read state) are swapped in place; others wait for the loop end.
+/// Read state is layer opacity and applies at once. Changes that keep order and widths are
+/// swapped in place; others wait for the loop end.
 final class TickerScrollView: NSView {
     /// Points per second; FR-1.4 makes speed a setting in V0.2.
     static let speed: CGFloat = 40
@@ -54,6 +56,7 @@ final class TickerScrollView: NSView {
     /// While scrolling (paused or not), anything that would move items waits for the loop end,
     /// so the strip never jumps under the reader.
     func show(_ newSegments: [TickerSegment]) {
+        dimReadItems(in: newSegments)
         if pending == nil, !segments.isEmpty, newSegments.count == segments.count,
            zip(newSegments, segments).allSatisfy({ $0.entry?.id == $1.entry?.id && $0.size == $1.size }) {
             updateInPlace(newSegments)
@@ -92,9 +95,22 @@ final class TickerScrollView: NSView {
         for copy in itemLayers {
             for (layer, segment) in zip(copy, newSegments) {
                 layer.contents = segment.image
+                layer.opacity = segment.opacity
             }
         }
         CATransaction.commit()
+    }
+
+    /// FR-1.9: a clicked headline dims within the 250 ms reload, not at the end of a loop that
+    /// can take minutes. Items only become read in V0.1, so this never brightens anything.
+    private func dimReadItems(in newSegments: [TickerSegment]) {
+        let readIDs = Set(newSegments.compactMap { $0.entry?.isRead == true ? $0.entry?.id : nil })
+        for copy in itemLayers {
+            for (layer, segment) in zip(copy, segments) {
+                guard let id = segment.entry?.id, readIDs.contains(id) else { continue }
+                layer.opacity = TickerStyle.readOpacity
+            }
+        }
     }
 
     private func rebuildLayers() {
@@ -113,6 +129,7 @@ final class TickerScrollView: NSView {
                 let layer = CALayer()
                 layer.contents = segment.image
                 layer.contentsScale = segment.scale
+                layer.opacity = segment.opacity
                 layer.frame = CGRect(
                     x: CGFloat(copy) * cycleWidth + offset,
                     y: ((bounds.height - segment.size.height) / 2).rounded(),

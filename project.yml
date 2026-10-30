@@ -29,6 +29,7 @@ targets:
     sources:
       - App
       - UI
+      - Services
       - Resources
     dependencies:
       - target: NotchFeedCore

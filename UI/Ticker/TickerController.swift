@@ -19,6 +19,7 @@ final class TickerController {
     private let model: AppModel
     private let panel = TickerPanel()
     private let scrollView = TickerScrollView()
+    private let visibility = VisibilityController()
     private var observers: [any NSObjectProtocol] = []
     private var renderCache: [RenderKey: TickerSegment] = [:]
     private var placement: (position: TickerPosition, displayID: UInt32?, showFeedName: Bool)?
@@ -61,6 +62,8 @@ final class TickerController {
             },
         ]
         scrollView.reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        visibility.onChange = { [weak self] in self?.updateVisibility() }
+        visibility.start()
         updatePlacement(force: true)
         observeModel()
     }
@@ -82,8 +85,21 @@ final class TickerController {
             return
         }
         panel.setFrame(TickerPositioner.frame(on: geometry, position: current.position), display: true)
-        panel.orderFrontRegardless()
+        updateVisibility()
         if feedNameChanged || force { render() }
+    }
+
+    /// FR-1.1: hidden while a full-screen app is in front on the ticker's display.
+    private func updateVisibility() {
+        guard let screen = NSScreen.tickerScreen(preferredDisplayID: placement?.displayID) else {
+            panel.orderOut(nil)
+            return
+        }
+        if visibility.isFullScreenAppShowing(on: screen) {
+            if panel.isVisible { panel.orderOut(nil) }
+        } else if !panel.isVisible {
+            panel.orderFrontRegardless()
+        }
     }
 
     // MARK: Rendering

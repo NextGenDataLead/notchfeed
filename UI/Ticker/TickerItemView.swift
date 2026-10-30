@@ -27,7 +27,6 @@ struct TickerItemView: View {
                 .font(.system(size: 11).monospacedDigit())
                 .foregroundStyle(TickerStyle.tertiaryText)
         }
-        .opacity(entry.isRead ? TickerStyle.readOpacity : 1)
         .frame(height: TickerPositioner.height)
         .fixedSize()
         .environment(\.colorScheme, .dark)
@@ -68,5 +67,6 @@ enum TickerStyle {
     static let secondaryText = Color.white.opacity(0.55)
     static let tertiaryText = Color.white.opacity(0.42)
     static let placeholder = Color.white.opacity(0.18)
-    static let readOpacity = 0.45
+    /// Applied as layer opacity by `TickerScrollView`, so a click dims the item right away.
+    static let readOpacity: Float = 0.45
 }

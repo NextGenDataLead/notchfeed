@@ -55,11 +55,11 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 ### Ticker (FR-1.1, 1.2, 1.8, 1.9)
 
 - [x] 8. Headlines scroll smoothly from right to left. Each shows favicon, feed name, headline and age ("5m", "2h", "3d"), newest first.
-- [ ] 9. Clicking a headline opens it in the default browser. The app you were in keeps focus, and the headline dims within about a second.
-  *First try: the browser opened but the headline didn't dim. The item was marked read, but the bar held every change until the end of its loop, which takes minutes with 50 headlines. Read state is now applied at once. Retest open.*
-- [ ] 10. Open a full-screen app (Safari, green button). The bar isn't shown in that Space; back on the desktop it is. It also shows on every desktop Space.
-  *First try: the bar showed over full-screen Safari and covered its toolbar, because macOS 26 puts the panel on full-screen Spaces anyway. The ticker now detects full screen from the window list and hides (see DECISIONS.md). Verified with a test window going full screen; retest with Safari open.*
-  *Also seen: the bar covers the title bar of a window that fills the screen (VS Code), so the window can't be dragged there. This is expected in V0.1, because macOS can't reserve screen space for a bar (PRD risks). Workarounds: Position › Bottom, or move the window from its Window menu. Overlap handling is FR-1.6 (V0.2).*
+- [x] 9. Clicking a headline opens it in the default browser. The app you were in keeps focus, and the headline dims within about a second.
+  *First try: the browser opened but the headline didn't dim. The item was marked read, but the bar held every change until the end of its loop, which takes minutes with 50 headlines. Read state is now applied at once (a70ca49); retest passed.*
+- [x] 10. Open a full-screen app (Safari, green button). The bar isn't shown in that Space; back on the desktop it is. It also shows on every desktop Space.
+  *First try: the bar showed over full-screen Safari and covered its toolbar, because macOS 26 puts the panel on full-screen Spaces anyway. The ticker now detects full screen from the window list and hides (see DECISIONS.md). Fixed in a70ca49; retest with Safari passed.*
+  *Also seen: the bar covers the title bar of a window that fills the screen (VS Code, or any window after a double-click on its title bar), so the window can't be dragged there. This is expected in V0.1, because macOS can't reserve screen space for a bar (PRD risks). Workarounds: Position › Bottom, or move the window from its Window menu. Overlap handling is FR-1.6 (V0.2).*
 
 ### Menu bar (FR-5.1, 5.2)
 

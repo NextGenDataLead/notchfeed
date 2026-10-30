@@ -33,7 +33,7 @@ open build/Build/Products/Debug/NotchFeed.app
 
 To start from an empty database, quit NotchFeed and delete `~/Library/Application Support/NotchFeed/`.
 
-**Current run:** started 2026-10-29 on macOS 26.5.2, MacBook with notch. Ticked items passed; notes in *italics* say what was found and fixed during the run.
+**Run for v0.1.0:** 2026-10-29 to 2026-10-30 on macOS 26.5.2, MacBook with notch. Ticked items passed; notes in *italics* say what was found and fixed during the run.
 
 ### First launch
 
@@ -76,9 +76,9 @@ To start from an empty database, quit NotchFeed and delete `~/Library/Applicatio
 - [x] 16. **Show unread count** off leaves only the icon.
 - [x] 17. **Position › Bottom** moves the bar to just above the Dock (try with the Dock hidden and on the left too); **Top** moves it back.
 - [ ] 18. With the external display connected, **Display › (external)** moves the bar there. Unplugging moves it to the built-in display, and the setting shows "(not connected)". Plugging back in moves it back.
-  *Skipped for now (2026-10-30).*
+  *Not run before the v0.1.0 tag; to do when the external display is at hand.*
 - [ ] 19. **Open NotchFeed at login**: copy `NotchFeed.app` to `/Applications`, open it from there, turn the toggle on, log out and in. NotchFeed starts. (If macOS asks, allow it in Login Items.) Turn it off again when done.
-  *Skipped for now (2026-10-30).*
+  *Not run before the v0.1.0 tag; to do at a later login.*
 
 ### Restart and accessibility (FR-4.6, NFR-5, NFR-6)
 

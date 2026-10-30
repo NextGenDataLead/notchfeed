@@ -4,6 +4,8 @@ All notable changes to this project are documented here. This project follows [S
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-30
+
 ### Added
 
 - Ticker bar: a thin, non-activating bar on every Space, kept off full-screen apps, under the menu bar or above the Dock, on the display you choose (FR-1.1, FR-1.2).
@@ -18,3 +20,12 @@ All notable changes to this project are documented here. This project follows [S
 - Settings window with General and Feeds tabs (FR-9.1), and Open at login (FR-9.2).
 - VoiceOver labels on ticker items; Reduce Motion stops the scroll (NFR-6).
 - Project scaffold: XcodeGen `project.yml`, core framework and Swift Testing target with fixture feeds.
+
+### Fixed during testing
+
+- Web pages in HTML5 are recognised as "not a feed" instead of "couldn't be read" (FR-4.1).
+- Only one copy of NotchFeed runs at a time; a second copy quits at launch.
+- The unread count is a small badge on the icon, so the item still fits beside the notch (FR-5.1).
+- The ticker hides over full-screen apps on macOS 26, detected from the window list (FR-1.1).
+- A clicked headline dims at once instead of at the end of the scroll loop (FR-1.9).
+- Setting changes such as Show feed name apply at once (FR-1.8, FR-9.1).
